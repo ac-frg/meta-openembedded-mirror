@@ -1,0 +1,43 @@
+From 65d1c6146995216538b0224e5aefe5e8c0c69a0d Mon Sep 17 00:00:00 2001
+From: Yoann Congal <yoann.congal@smile.fr>
+Date: Sat, 22 Mar 2025 22:11:47 +0100
+Subject: [PATCH] libpoke: Remove existing script cleanup
+
+There is a race condition between 2 actions:
+* Removal of existing scripts $(pkgdatadir)/*.pk in "install-data-local"
+* Installation of default scripts with automake:
+  "dist_pkgdata_DATA = pkl-rt.pk pkl-config.pk std.pk std-types.pk"
+
+Sadly, "install-data-local" and the generated target from
+"dist_pkgdata_DATA" are not ordered. Depending on the build system load,
+removal can (rarely) happen *after* the installation. In this case, no
+script in present in $(pkgdatadir) when the install process end.
+
+In OE, we always install on an empty sysroot, so, no pre-existing scripts can
+exists. Remove the code that does the cleanup to avoid the race-condition.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Yoann Congal <yoann.congal@smile.fr>
+---
+ libpoke/Makefile.am | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/libpoke/Makefile.am b/libpoke/Makefile.am
+index 6eff76b..965252b 100644
+--- a/libpoke/Makefile.am
++++ b/libpoke/Makefile.am
+@@ -268,13 +268,4 @@ pvm-vm1.c: pvm-vm.h
+ pvm-vm2.c: pvm-vm1.c
+ 	@{ test -f $(srcdir)/pvm-vm2.c && test ! $(srcdir)/pvm-vm2.c -ot $(srcdir)/pvm-vm1.c; } || $(MAKE) generate-vm-files
+ 
+-# In order to avoid problems with older installations, we remove the
+-# Poke scripts installed in $(pkgdatadir).  Note however that other
+-# programs may install scripts in subdirectories under $(pkgdatadir),
+-# and these are not to be touched.
+-install-data-local: uninstall-sources
+-uninstall-local: uninstall-sources
+-uninstall-sources:
+-	rm -f $(DESTDIR)$(pkgdatadir)/*.pk
+-
+ # End of Makefile.am

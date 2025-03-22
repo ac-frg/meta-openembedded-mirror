@@ -7,6 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 SRC_URI = "${GNU_MIRROR}/poke/poke-${PV}.tar.gz \
           file://0003-configure.ac-HELP2MAN-replace-by-true-when-cross-com.patch \
+          file://0001-libpoke-Remove-existing-script-cleanup.patch \
           "
 
 DEPENDS = "flex-native bison-native bdwgc readline"
