@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sat, 21 Nov 2026 00:00:00 -0800
+Subject: [PATCH] tests: look up the dwarf_origin fixture relative to the test
+ directory
+
+DWARF_ORIGIN_BINARY is set to the absolute path of the fixture in the
+build tree, so bpftrace_test embeds the build directory and cannot find
+the fixture once the tests are installed elsewhere. ctest runs
+bpftrace_test from the tests build directory, so a path relative to it
+works both there and in an installed copy of the tests directory.
+
+Upstream-Status: Pending
+AI-Generated: Uses Claude Code
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ tests/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -65,7 +65,7 @@ add_subdirectory(data)
+ add_dependencies(bpftrace_test data_source_dwarf data_source_btf)
+ add_dependencies(bpftrace_test dwarf_origin_fixture)
+ target_compile_definitions(bpftrace_test PRIVATE
+-  DWARF_ORIGIN_BINARY="${CMAKE_CURRENT_BINARY_DIR}/data/dwarf_origin")
++  DWARF_ORIGIN_BINARY="data/dwarf_origin")
+ target_include_directories(bpftrace_test PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+ target_include_directories(bpftrace_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+ 
